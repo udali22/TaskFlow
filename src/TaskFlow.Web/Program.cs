@@ -9,12 +9,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -23,7 +17,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Tickets}/{action=Index}/{id?}");
 
 // Migration appliquée au démarrage : choix adapté à une app de démo
 // mono-instance (en production, la migration serait une étape de déploiement).
@@ -31,6 +25,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+    DbSeeder.Seed(db);
 }
 
 app.Run();
