@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: taskflow
+      # Mot de passe de developpement local uniquement
+      POSTGRES_PASSWORD: taskflow_dev
+      POSTGRES_DB: taskflow
+    ports:
+      # 5433 côté hôte : évite le conflit avec un PostgreSQL installé localement
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskflow -d taskflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: .
+    ports:
+      # 8081 côté hôte : 8080 est souvent déjà pris par d'autres services locaux
+      - "8081:8080"
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=taskflow;Username=taskflow;Password=taskflow_dev"
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

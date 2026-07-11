@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+specs/
+README.md
+docker-compose.yml
+Dockerfile
